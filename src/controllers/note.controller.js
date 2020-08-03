@@ -30,6 +30,20 @@ const getNoteById = async(request, response)=>{
     }
 }
 
+const getNotesByPartition = async( request, response )=>{
+    const {partitionId} = request.params;
+    
+    try {
+        const connection = getConnection();
+
+        const docsByPartion = await connection.partitionedList( partitionId, {include_docs:true} );
+
+        return buildResponse( response, 200, { msg: "Docs by partition", docsByPartion  } );
+    } catch (error) {
+        return buildResponse( response, 500, {} );
+    }
+}
+
 
 const saveNote = async( request, response )=>{
     const noteData = request.body;
@@ -46,6 +60,24 @@ const saveNote = async( request, response )=>{
         return buildResponse( response, 500, {} ); ;    
     }
 }
+
+//for bulk operations
+const saveManyNotes = async(request, response )=>{
+    // we spect an array of notes in request
+    const docs = request.body;
+
+    try {
+        const connection = getConnection();
+
+        const resultset = await connection.bulk({docs});
+
+        return buildResponse( response, 201, { msg: "created", resultset } );
+    } catch (error) {
+        return buildResponse( response, 500, {} ); ;
+    }
+
+}
+
 
 const updateNote = async(request, response)=>{
     const {id} = request.params;
@@ -89,7 +121,9 @@ const deleteNote = async( request, response )=>{
 module.exports = {
     getAllNotes,
     getNoteById,
+    getNotesByPartition,
     saveNote,
+    saveManyNotes,
     updateNote,
     deleteNote
 }
