@@ -1,6 +1,20 @@
 ## More information
 # https://cloud.ibm.com/docs/node?topic=node-cloudant#test-cloudant
 
+## How Database is stored
+https://cloud.ibm.com/docs/Cloudant?topic=Cloudant-how-is-data-stored-in-ibm-cloudant-#how-is-data-stored-in-ibm-cloudant-
+
+## Patitioned key
+https://cloud.ibm.com/docs/Cloudant?topic=Cloudant-database-partitioning
+
+## Use node with Cloudant
+https://developer.ibm.com/tutorials/learn-nodejs-node-with-cloudant-dbaas/
+
+## IBM Devleoper Cloudant
+https://developer.ibm.com/?s=cloudant
+
+
+
 ## 1) create node project
 # $ npm i -y
 

@@ -1,8 +1,8 @@
 const { buildResponse } = require('./controllerUtils');
 const { getConnection } = require('../database');
- 
+const uuid4  =  require('uuid4') ;
 
-const getAllNotes = async( request, response )=>{
+const getAllDocuments = async( request, response )=>{
     
     try {
         const connection = getConnection();
@@ -16,7 +16,7 @@ const getAllNotes = async( request, response )=>{
 
 }
 
-const getNoteById = async(request, response)=>{
+const getDocumentById = async(request, response)=>{
     const {id} = request.params;
 
     try {
@@ -30,7 +30,7 @@ const getNoteById = async(request, response)=>{
     }
 }
 
-const getNotesByPartition = async( request, response )=>{
+const getDocsByPartition = async( request, response )=>{
     const {partitionId} = request.params;
     
     try {
@@ -45,9 +45,17 @@ const getNotesByPartition = async( request, response )=>{
 }
 
 
-const saveNote = async( request, response )=>{
+const saveDocument = async( request, response )=>{
+    const {partitionId} = request.params;
+    const key = uuid4();
+
+    console.log(`key is ${key}`);
+
     const noteData = request.body;
 
+    noteData['_id'] = [ partitionId, key ].join(":");
+
+    
     console.log( noteData );
 
     try {
@@ -62,9 +70,19 @@ const saveNote = async( request, response )=>{
 }
 
 //for bulk operations
-const saveManyNotes = async(request, response )=>{
+const saveDocsByPartition = async(request, response )=>{
+
+    //we get the partition
+    const {partitionId} = request.params; 
+
     // we spect an array of notes in request
     const docs = request.body;
+
+    //generate the id
+    docs.forEach( doc => {
+        const key = uuid4();
+        doc._id = [ partitionId, key  ].join(":");
+    });
 
     try {
         const connection = getConnection();
@@ -73,13 +91,14 @@ const saveManyNotes = async(request, response )=>{
 
         return buildResponse( response, 201, { msg: "created", resultset } );
     } catch (error) {
+        console.log(error);
         return buildResponse( response, 500, {} ); ;
     }
 
 }
 
 
-const updateNote = async(request, response)=>{
+const updateDocument = async(request, response)=>{
     const {id} = request.params;
     const sentData = request.body;
 
@@ -100,7 +119,7 @@ const updateNote = async(request, response)=>{
 }
 
 
-const deleteNote = async( request, response )=>{
+const deleteDocument = async( request, response )=>{
     const {id} = request.params;
 
     try {
@@ -119,11 +138,11 @@ const deleteNote = async( request, response )=>{
 }
 
 module.exports = {
-    getAllNotes,
-    getNoteById,
-    getNotesByPartition,
-    saveNote,
-    saveManyNotes,
-    updateNote,
-    deleteNote
+    getAllDocuments,
+    getDocumentById,
+    updateDocument,
+    deleteDocument,
+    saveDocument,    
+    getDocsByPartition,
+    saveDocsByPartition
 }
